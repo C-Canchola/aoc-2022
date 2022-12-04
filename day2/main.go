@@ -15,7 +15,7 @@ func (Sln) ExampleSolutionPartOne() int {
 	return 15
 }
 func (Sln) SolvePartOne(lines []string) int {
-	scores := utils.Map(lines, calcLineScorePart1)
+	scores := utils.MapFn(lines, calcLineScorePart1)
 	return utils.Sum(scores)
 }
 
@@ -24,7 +24,7 @@ func (Sln) ExampleSolutionPartTwo() int {
 }
 
 func (Sln) SolvePartTwo(lines []string) int {
-	scores := utils.Map(lines, calcLineScorePart2)
+	scores := utils.MapFn(lines, calcLineScorePart2)
 	return utils.Sum(scores)
 }
 
@@ -82,28 +82,10 @@ func getWinScoreFromCode(oppenentChoice int, playerChoice int) int {
 	if playerChoice == oppenentChoice {
 		return 3
 	}
-	if oppenentChoice == rock {
-		if playerChoice == paper {
-			return 6
-		}
-		return 0
+	if playerChoice == winMap[oppenentChoice] {
+		return 6
 	}
-
-	if oppenentChoice == paper {
-		if playerChoice == scissors {
-			return 6
-		}
-		return 0
-	}
-
-	if oppenentChoice == scissors {
-		if playerChoice == rock {
-			return 6
-		}
-		return 0
-	}
-
-	panic("unable to calc win score")
+	return 0
 }
 
 func calcLineScorePart1(l string) int {

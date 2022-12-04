@@ -71,10 +71,61 @@ func Copy[T any](a []T) []T {
 }
 
 // allows the mapping of a slice to another slice type by providing a function to be applied to each element
-func Map[T any, K any](a []T, fn func(T) K) []K {
+func MapFn[T any, K any](a []T, fn func(T) K) []K {
 	mapped := make([]K, 0, len(a))
 	for _, el := range a {
 		mapped = append(mapped, fn(el))
 	}
 	return mapped
+}
+
+// Reduce applies a reduction to a slice by taking a function which acts upon each successive element
+// and returns/update the reduced value
+func Reduce[T any, K any](a []T, initial K, fn func(T, K) K) K {
+	reducedValue := initial
+	for _, el := range a {
+		reducedValue = fn(el, reducedValue)
+	}
+	return reducedValue
+}
+
+// UniqueMap converts any ordered slice to a map with each element found with a true value
+func UniqueMap[T comparable](a []T) map[T]bool {
+	m := make(map[T]bool)
+	for _, el := range a {
+		m[el] = true
+	}
+	return m
+}
+
+// MapKeys returns a slice of only the keys of a map
+func MapKeys[T comparable, K any](m map[T]K) []T {
+	a := make([]T, 0, len(m))
+	for k := range m {
+		a = append(a, k)
+	}
+	return a
+}
+
+// Intersect is a utility function which returns the unique elements which appear in both slices
+func Intersect[T constraints.Ordered](as ...[]T) []T {
+	if len(as) == 0 {
+		return []T{}
+	}
+
+	uniqueMap := Reduce(as, nil, func(a []T, m map[T]bool) map[T]bool {
+		if m == nil {
+			return UniqueMap(a)
+		}
+
+		newM := map[T]bool{}
+		for _, el := range a {
+			if !m[el] {
+				continue
+			}
+			newM[el] = true
+		}
+		return newM
+	})
+	return MapKeys(uniqueMap)
 }
