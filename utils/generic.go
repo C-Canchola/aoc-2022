@@ -51,6 +51,14 @@ func Sort[T any, V constraints.Ordered](a []T, fn func(T) V) {
 	})
 }
 
+// SortFromPredicate is a convenience function which calls the std lib sort slice stable using a more intuitive interface which is a function which
+// returns whether the first provided value of the generic type is less than the second
+func SortFromPredicate[T any](a []T, fn func(T, T) bool) {
+	sort.SliceStable(a, func(i, j int) bool {
+		return fn(a[i], a[j])
+	})
+}
+
 // Sum is a generic sum function to any numeric slice
 func Sum[T Number](a []T) T {
 	var sum T
@@ -87,6 +95,18 @@ func Reduce[T any, K any](a []T, initial K, fn func(T, K) K) K {
 		reducedValue = fn(el, reducedValue)
 	}
 	return reducedValue
+}
+
+// Filter is a utility function which returns a new slice where the provided predicate returns true for an element
+func Filter[T any](a []T, pred func(T) bool) []T {
+	filtered := make([]T, 0, len(a))
+	for _, el := range a {
+		if !pred(el) {
+			continue
+		}
+		filtered = append(filtered, el)
+	}
+	return filtered
 }
 
 // UniqueMap converts any ordered slice to a map with each element found with a true value
@@ -128,4 +148,15 @@ func Intersect[T constraints.Ordered](as ...[]T) []T {
 		return newM
 	})
 	return MapKeys(uniqueMap)
+}
+
+// Any is a utility function which returns if a predicate returns True for any of the elements
+func Any[T any](a []T, fn func(v T) bool) bool {
+	for _, el := range a {
+		if !fn(el) {
+			continue
+		}
+		return true
+	}
+	return false
 }

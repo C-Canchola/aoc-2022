@@ -5,11 +5,11 @@ import (
 	"fmt"
 )
 
-// https://adventofcode.com/2022/day/2
+// https://adventofcode.com/2022/day/3
 type Sln struct {
 }
 
-var _ utils.SolutionBetter[int, int] = Sln{}
+var _ utils.Solution[int, int] = Sln{}
 
 func (Sln) ExampleSolutionPartOne() int {
 	return 157
@@ -28,7 +28,30 @@ func (Sln) ExampleSolutionPartTwo() int {
 }
 
 func (Sln) SolvePartTwo(lines []string) int {
-	priorities := getGroupedPriorities(lines)
+	groupedLines := utils.Reduce(lines, nil, func(s string, groupedLines [][]string) [][]string {
+		if groupedLines == nil {
+			groupedLines = [][]string{{}}
+		}
+
+		lastIndex := len(groupedLines) - 1
+		indexAdder := 0
+
+		if len(groupedLines[lastIndex]) == 3 {
+			groupedLines = append(groupedLines, []string{})
+			indexAdder = 1
+		}
+
+		newLastIndex := lastIndex + indexAdder
+		groupedLines[newLastIndex] = append(groupedLines[newLastIndex], s)
+
+		return groupedLines
+
+	})
+
+	priorities := utils.MapFn(groupedLines, func(g []string) int {
+		return getPriorityFromStrings(g...)
+	})
+
 	return utils.Sum(priorities)
 }
 
@@ -64,33 +87,4 @@ func getCommonCharacter(groupedText ...string) byte {
 func getPriorityFromStrings(a ...string) int {
 	commonChar := getCommonCharacter(a...)
 	return getPriority(commonChar)
-}
-
-func getGroupedLines(lines []string) [][]string {
-	return utils.Reduce(lines, nil, func(s string, groupedLines [][]string) [][]string {
-		if groupedLines == nil {
-			groupedLines = [][]string{{}}
-		}
-		lastIndex := len(groupedLines) - 1
-		indexAdder := 0
-		if len(groupedLines[lastIndex]) == 3 {
-			groupedLines = append(groupedLines, []string{})
-			indexAdder = 1
-		}
-
-		newLastIndex := lastIndex + indexAdder
-		groupedLines[newLastIndex] = append(groupedLines[newLastIndex], s)
-		return groupedLines
-
-	})
-}
-
-// part two -> simply need to find common letter in groups of three and then apply priorities
-func getGroupedPriorities(lines []string) []int {
-	groupedLines := getGroupedLines(lines)
-
-	return utils.MapFn(groupedLines, func(g []string) int {
-		return getPriorityFromStrings(g...)
-	})
-
 }

@@ -4,11 +4,10 @@ import (
 	"aoc-2022/utils"
 )
 
-// https://adventofcode.com/2022/day/2
 type Sln struct {
 }
 
-var _ utils.SolutionBetter[int, int] = Sln{}
+var _ utils.Solution[int, int] = Sln{}
 
 func (Sln) ExampleSolutionPartOne() int {
 	return 0

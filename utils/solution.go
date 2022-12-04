@@ -2,18 +2,27 @@ package utils
 
 import (
 	"fmt"
+	"time"
 
 	"golang.org/x/exp/constraints"
 )
 
-type SolutionBetter[T_1 constraints.Ordered, T_2 constraints.Ordered] interface {
+type Solution[T_1 comparable, T_2 comparable] interface {
 	SolvePartOne([]string) T_1
 	ExampleSolutionPartOne() T_1
 	SolvePartTwo([]string) T_2
 	ExampleSolutionPartTwo() T_2
 }
 
-func printSection[T constraints.Ordered](name string, exSln T, exCalc T, inputCalc T) {
+func solveTimed[T comparable](fn func([]string) T, lines []string) (T, time.Duration) {
+	start := time.Now()
+	v := fn(lines)
+	end := time.Now()
+
+	return v, end.Sub(start)
+}
+
+func printSection[T constraints.Ordered](name string, exSln T, exCalc T, inputCalc T, exDur time.Duration, inputDur time.Duration) {
 	fmt.Println(name)
 
 	fmt.Println("")
@@ -26,39 +35,29 @@ func printSection[T constraints.Ordered](name string, exSln T, exCalc T, inputCa
 	fmt.Println("pass")
 	fmt.Println(exSln == exCalc)
 	fmt.Println("")
+	fmt.Println("example time")
+	fmt.Println(exDur.Seconds())
+	fmt.Println("input time")
+	fmt.Println(inputDur.Seconds())
+	fmt.Println("")
 	fmt.Println("input")
 	fmt.Println(inputCalc)
 
 }
 
-func Solve[T_1 constraints.Ordered, T_2 constraints.Ordered](s SolutionBetter[T_1, T_2]) {
+func Solve[T_1 constraints.Ordered, T_2 constraints.Ordered](s Solution[T_1, T_2]) {
 	exLines, inputLines := ReadExample(), ReadInput()
 
-	exCalc1, inputCalc1 := s.SolvePartOne(exLines), s.SolvePartOne(inputLines)
-	printSection("Part 1", s.ExampleSolutionPartOne(), exCalc1, inputCalc1)
+	exCalc1, exCalc1Dur := solveTimed(s.SolvePartOne, exLines)
+	inputCalc1, inputCalc1Dur := solveTimed(s.SolvePartOne, inputLines)
+
+	// exCalc1, inputCalc1 := s.SolvePartOne(exLines), s.SolvePartOne(inputLines)
+	printSection("Part 1", s.ExampleSolutionPartOne(), exCalc1, inputCalc1, exCalc1Dur, inputCalc1Dur)
 	fmt.Println("-----")
 
-	exCalc2, inputCalc2 := s.SolvePartTwo(exLines), s.SolvePartTwo(inputLines)
-	printSection("Part 2", s.ExampleSolutionPartTwo(), exCalc2, inputCalc2)
+	exCalc2, exCalc2Dur := solveTimed(s.SolvePartTwo, exLines)
+	inputCalc2, inputCalc2Dur := solveTimed(s.SolvePartTwo, inputLines)
 
-}
+	printSection("Part 2", s.ExampleSolutionPartTwo(), exCalc2, inputCalc2, exCalc2Dur, inputCalc2Dur)
 
-type Solution[T constraints.Ordered] interface {
-	Solve([]string) T
-	ExampleSolution() T
-}
-
-func SolveOld[T constraints.Ordered](p Solution[T]) {
-	exLines, inputLines := ReadExample(), ReadInput()
-
-	exAnswer, inputAnswer := p.Solve(exLines), p.Solve(inputLines)
-
-	fmt.Println("expected example answer:", p.ExampleSolution())
-	fmt.Println("calculated example answer:", exAnswer)
-	fmt.Println("example pass:", exAnswer == p.ExampleSolution())
-
-	fmt.Println("---")
-
-	fmt.Println("input answer")
-	fmt.Println(inputAnswer)
 }

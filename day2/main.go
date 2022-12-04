@@ -9,7 +9,7 @@ import (
 type Sln struct {
 }
 
-var _ utils.SolutionBetter[int, int] = Sln{}
+var _ utils.Solution[int, int] = Sln{}
 
 func (Sln) ExampleSolutionPartOne() int {
 	return 15
