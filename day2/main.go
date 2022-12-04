@@ -15,15 +15,17 @@ func (Sln) ExampleSolutionPartOne() int {
 	return 15
 }
 func (Sln) SolvePartOne(lines []string) int {
-	return -1
+	scores := utils.Map(lines, calcLineScorePart1)
+	return utils.Sum(scores)
 }
 
 func (Sln) ExampleSolutionPartTwo() int {
-	return 0
+	return 12
 }
 
 func (Sln) SolvePartTwo(lines []string) int {
-	return -1
+	scores := utils.Map(lines, calcLineScorePart2)
+	return utils.Sum(scores)
 }
 
 func main() {
@@ -32,17 +34,29 @@ func main() {
 
 }
 
-var responseMap = map[string]int{
-	"X": 1,
-	"Y": 2,
-	"Z": 3,
-}
-
 const (
 	rock int = iota
 	paper
 	scissors
 )
+
+var choiceScores map[int]int = map[int]int{
+	rock:     1,
+	paper:    2,
+	scissors: 3,
+}
+
+var loseMap map[int]int = map[int]int{
+	scissors: paper,
+	paper:    rock,
+	rock:     scissors,
+}
+
+var winMap map[int]int = map[int]int{
+	scissors: rock,
+	paper:    scissors,
+	rock:     paper,
+}
 
 func getChoiceFromChar(c string) int {
 	switch c {
@@ -58,8 +72,13 @@ func getChoiceFromChar(c string) int {
 
 	}
 }
-func getWinScore(opponent string, player string) int {
-	oppenentChoice, playerChoice := getChoiceFromChar(opponent), getChoiceFromChar(player)
+
+func getOpAndPlayerChoice(l string) (int, int) {
+	splt := strings.Split(l, " ")
+	return getChoiceFromChar(splt[0]), getChoiceFromChar(splt[1])
+}
+
+func getWinScoreFromCode(oppenentChoice int, playerChoice int) int {
 	if playerChoice == oppenentChoice {
 		return 3
 	}
@@ -87,7 +106,36 @@ func getWinScore(opponent string, player string) int {
 	panic("unable to calc win score")
 }
 
-func calcLineScore(l string) int {
-	choices := strings.Split(l, " ")
-	return getWinScore(choices[0], choices[1]) + responseMap[choices[1]]
+func calcLineScorePart1(l string) int {
+	op, pl := getOpAndPlayerChoice(l)
+	return getWinScoreFromCode(op, pl) + choiceScores[pl]
+}
+
+// rock -> lose. paper -> draw, scissors -> win
+func getNewMove(op int, pl int) int {
+	switch pl {
+
+	case rock:
+		return loseMap[op]
+
+	case paper:
+		return op
+
+	case scissors:
+		return winMap[op]
+
+	default:
+		panic("unable to get new move")
+	}
+}
+
+func calcLineScorePart2(l string) int {
+	op, pl := getOpAndPlayerChoice(l)
+	newPl := getNewMove(op, pl)
+
+	winScore := getWinScoreFromCode(op, newPl)
+	choiceScore := choiceScores[newPl]
+	score := winScore + choiceScore
+
+	return score
 }
