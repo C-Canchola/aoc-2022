@@ -41,7 +41,7 @@ func Must[T any](fn func() (T, error)) T {
 	return v
 }
 
-// ParseIntMust, is a helper function which panics if a string is not parseable as an integer.
+// ParseIntMust is a helper function which panics if a string is not parseable as an integer.
 // Reduces unecessary error handling as this call signifies an unparseable should never happen
 func ParseIntMust(s string) int {
 	return Must(func() (int, error) {
