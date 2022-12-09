@@ -40,6 +40,32 @@ func FindMax[T any, V constraints.Ordered](a []T, fn func(T) V) (V, int) {
 	return curMax, curMaxPos
 }
 
+func FindMinFromFunc[T any, V constraints.Ordered](a []T, fn func(T) V) (V, int) {
+	if len(a) == 0 {
+		panic("must not attempt to find max of empty slice")
+	}
+
+	curMin := fn(a[0])
+	curMinPos := 0
+
+	for idx, el := range a[1:] {
+		potentialMin := fn(el)
+
+		if !(potentialMin < curMin) {
+			continue
+		}
+
+		curMin = potentialMin
+		curMinPos = idx + 1
+	}
+
+	return curMin, curMinPos
+}
+
+func FindMinEl[T constraints.Ordered](a []T) (T, int) {
+	return FindMinFromFunc(a, func(el T) T { return el })
+}
+
 type Number interface {
 	constraints.Integer | constraints.Float
 }
