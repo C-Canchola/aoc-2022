@@ -213,11 +213,6 @@ func getVisibleCount(heights [][]int, globalMaxes [][]int) int {
 	return c
 }
 
-// part 2:
-/*
-like above examine every direction
-*/
-
 func getDirectionDistance(heights [][]int, i int, j int, fn func(int, int) (int, int)) int {
 	d := 1
 	x, y := i, j
