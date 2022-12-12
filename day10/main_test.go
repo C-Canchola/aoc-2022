@@ -3,9 +3,10 @@
 package main
 
 import (
+	"aoc-2022/utils"
 	"testing"
 )
 
 func TestSolution(t *testing.T) {
-	getExGif()
+	utils.Solve[int, int](Sln{})
 }

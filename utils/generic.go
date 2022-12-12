@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"sort"
 
 	"golang.org/x/exp/constraints"
@@ -185,4 +186,23 @@ func Any[T any](a []T, fn func(v T) bool) bool {
 		return true
 	}
 	return false
+}
+
+func ToJsonStringMust[T any](v T) string {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
+
+// CombineMaps returns the combination of provided maps. Will overwrite using the most right handed value
+func CombineMaps[T comparable, K comparable](ms ...map[T]K) map[T]K {
+	cm := map[T]K{}
+	for _, m := range ms {
+		for k, v := range m {
+			cm[k] = v
+		}
+	}
+	return cm
 }
